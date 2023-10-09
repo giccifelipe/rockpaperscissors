@@ -30,4 +30,4 @@ With the extension of Spock and Lizard game rules are simple:
 - Lizar beats Spock and Papers
 - Spock beats Scissors and Rock
 
-Thank you for checking out our Rock, Paper, Scissors game in C#! We hope you have fun playing it and stay tuned for the upcoming Spock and Lizard additions!
+Thank you for checking out our Rock, Paper, Scissors game in C#! We hope you have fun playing it!
