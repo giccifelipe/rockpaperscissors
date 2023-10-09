@@ -7,15 +7,20 @@ extendGame = extendGame ?? "n";
 
 GameHelper.SetExtendOptions(string.Equals(extendGame, "y", StringComparison.OrdinalIgnoreCase));
 
+string computer2Choice = "", userChoice = "", computerChoice = "";
+
 while (true)
 {
-    string? userChoice = GameHelper.GetUserChoice();
-    string computerChoice = GameHelper.GetComputerChoice();
+    userChoice = GameHelper.GetUserChoice();
+    computerChoice = GameHelper.GetComputerChoice();
 
     ConsoleHelper.Write($"You choose: {userChoice}", MessageType.Blue);
     ConsoleHelper.Write($"Computer choose: {computerChoice}", MessageType.Orange);
 
-    var (Message, WinnerStatus) = GameHelper.DetermineWinner(userChoice, computerChoice);
+    if (!string.IsNullOrWhiteSpace(computer2Choice))
+        ConsoleHelper.Write($"Second computer choose: {computer2Choice}", MessageType.Orange);
+
+    var (Message, WinnerStatus) = GameHelper.DetermineWinner(userChoice, computerChoice, computer2Choice);
     ConsoleHelper.Write(Message, WinnerStatus == 1 ? MessageType.Success : (WinnerStatus == 0 ? MessageType.Warning : MessageType.Error));
 
     ConsoleHelper.Write("Would you like to play again? (y/n): ", BreakLine: false);
@@ -28,4 +33,5 @@ while (true)
         break;
     }
 
+    computer2Choice = userChoice;
 }

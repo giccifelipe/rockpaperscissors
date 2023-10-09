@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel.Design;
 
 namespace RPS.Game.Helpers
 {
@@ -32,36 +32,99 @@ namespace RPS.Game.Helpers
             return DefaultChoices[new Random().Next(0, DefaultChoices.Count())];
         }
 
-        public static (string Message, int WinnerStatus) DetermineWinner(string user_choice, string computer_choice)
+        public static (string Message, int WinnerStatus) DetermineWinner(string user_choice, string pc1_choice, string pc2_choice = "")
         {
             user_choice = user_choice.ToLower();
-            computer_choice = computer_choice.ToLower();
+            pc1_choice = pc1_choice.ToLower();
+            pc2_choice = pc2_choice.ToLower();
 
-            if (user_choice == computer_choice)
+            // Check for a tie when all three choices are the same
+            if (user_choice == pc1_choice && (string.IsNullOrEmpty(pc2_choice) || (!string.IsNullOrEmpty(pc2_choice) && pc1_choice == pc2_choice)))
                 return ("It's a tie!", 0);
-            else if (
-                (
-                    !_ExtendedVersion &&
-                    (
-                        (user_choice == "rock" && computer_choice == "scissors") ||
-                        (user_choice == "paper" && computer_choice == "rock") ||
-                        (user_choice == "scissors" && computer_choice == "paper")
-                    )
-                ) ||
-                (
-                    _ExtendedVersion &&
-                    (
-                        (user_choice == "rock" && (computer_choice == "scissors" || computer_choice == "lizard")) ||
-                        (user_choice == "paper" && (computer_choice == "rock" || computer_choice == "spock")) ||
-                        (user_choice == "sciss||s" && (computer_choice == "paper" || computer_choice == "lizard")) ||
-                        (user_choice == "spock" && (computer_choice == "rock" || computer_choice == "scissors")) ||
-                        (user_choice == "lizard" && (computer_choice == "spock" || computer_choice == "paper"))
-                    )
-                )
-            )
+
+            int userResult = CheckWin(user_choice, pc1_choice, pc2_choice);
+            int player2Result = CheckWin(pc1_choice, pc2_choice, user_choice);
+
+            // Check for a tie when each player wins over the others
+            if (!string.IsNullOrWhiteSpace(pc2_choice))
+            {
+                int player3Result = CheckWin(pc2_choice, user_choice, pc1_choice);
+                if (userResult == 1 && player2Result == 1 && player3Result == -1)
+                    return ("It's a tie!", 0);
+            }
+
+            // Check if any player has won
+            if (userResult == 1 && player2Result == 0 && player2Result == 0)
+            {
                 return ("You win!", 1);
+            }
+            else if (player2Result == 1 && userResult == 0 && player2Result == 0)
+            {
+                return ("Computer wins!", 2);
+            }
+            else if (userResult == 1 && player2Result == 1 && player2Result == 0)
+            {
+                return ("You and Computer wins!", 3);
+            }
+            else if (userResult == 1 && player2Result == 0 && player2Result == 1)
+            {
+                return ("You and Second computer wins!", 3);
+            }
+            else if (userResult == 0 && player2Result == 1 && player2Result == 1)
+            {
+                return ("Computer and Second Computer wins!", 3);
+            }
             else
-                return ("Compnuter wins!", -1);
+            {
+                return ("Second computer wins!", 3);
+            }
+        }
+
+        // Helper function to check for win/loss
+        private static int CheckWin(string user_choice, string pc1_choice, string pc2_choice = "")
+        {
+            if (
+                (!_ExtendedVersion &&
+                (
+                    (user_choice == "rock" && pc1_choice == "scissors") ||
+                    (user_choice == "paper" && pc1_choice == "rock") ||
+                    (user_choice == "scissors" && pc1_choice == "paper")
+                )) ||
+                (_ExtendedVersion &&
+                (
+                    (user_choice == "rock" && (pc1_choice == "scissors" || pc1_choice == "lizard")) ||
+                    (user_choice == "paper" && (pc1_choice == "rock" || pc1_choice == "spock")) ||
+                    (user_choice == "scissors" && (pc1_choice == "paper" || pc1_choice == "lizard")) ||
+                    (user_choice == "spock" && (pc1_choice == "rock" || pc1_choice == "scissors")) ||
+                    (user_choice == "lizard" && (pc1_choice == "spock" || pc1_choice == "paper"))
+                )))
+            {
+                return 1; // Win
+            }
+            else if ((!string.IsNullOrEmpty(pc2_choice)) && (
+                (!_ExtendedVersion &&
+                (
+                    (user_choice == "rock" && pc2_choice == "scissors") ||
+                    (user_choice == "paper" && pc2_choice == "rock") ||
+                    (user_choice == "scissors" && pc2_choice == "paper")
+                )) ||
+                (_ExtendedVersion &&
+                (
+                    (user_choice == "rock" && (pc2_choice == "scissors" || pc2_choice == "lizard")) ||
+                    (user_choice == "paper" && (pc2_choice == "rock" || pc2_choice == "spock")) ||
+                    (user_choice == "scissors" && (pc2_choice == "paper" || pc2_choice == "lizard")) ||
+                    (user_choice == "spock" && (pc2_choice == "rock" || pc2_choice == "scissors")) ||
+                    (user_choice == "lizard" && (pc2_choice == "spock" || pc2_choice == "paper"))
+                ))))
+            {
+                return -1; // Loss
+            }
+            else if (string.IsNullOrEmpty(pc2_choice))
+                return -1; // Loss
+            else
+            {
+                return 0; // Tie
+            }
         }
     }
 }
